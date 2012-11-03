@@ -27,7 +27,7 @@ run MessagePack::RPCOverHTTP::Server.app(MyHandler.new)
 ```
 
 rackup:
-```ruby
+```zsh
 % rackup config.ru -s thin
 >> Thin web server (v1.5.0 codename Knife)
 >> Maximum connections set to 1024
