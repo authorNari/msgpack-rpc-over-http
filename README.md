@@ -2,7 +2,7 @@
 
 This library provides [MessagePack-RPC](https://github.com/msgpack/msgpack-rpc) via HTTP as XML-RPC.
 The original MessagePack-RPC Server in Ruby is not good in some cases.
-It doesn't scale. It's incompatible with Thread. There is no decent termination...
+It doesn't scale. It's incompatible with Thread. There is no decent termination processing...
 
 We alreadly have various high perfomance HTTP servers.
 We can use these in MessagePack-RPC over HTTP.
