@@ -10,7 +10,7 @@ We can use these in MessagePack-RPC over HTTP.
 **CAUTION**
 
 There is no compatibility with other implementation of normal MessagePack-RPC (not over HTTP).
-So you can not connect a normal RPC client to a RPC server over HTTP.
+So a normal RPC client can not connect a HTTP server.
 
 ## Usage
 
