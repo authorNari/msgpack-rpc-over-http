@@ -29,7 +29,7 @@ module MessagePack
             ]
           end
 
-          if req.media_type != "text/plain"
+          if req.media_type != "application/x-msgpack"
             return [
               400, # Bad Request
               {'Content-Type' => 'text/plain'},

@@ -9,7 +9,7 @@ module MessagePack
     class Client
       extend Forwardable
 
-      HEADER = {"Content-Type" => 'text/plain'}
+      HEADER = {"Content-Type" => 'application/x-msgpack'}
 
       def initialize(url, options={})
         @url = url
@@ -19,7 +19,7 @@ module MessagePack
       end
 
       def_delegators(:@client,
-        :connect_timeout, :send_timeout, :receive_timeout)
+        :connect_timeout, :send_timeout, :receive_timeout, :debug_dev=)
 
       # call-seq:
       #   call(symbol, *args) -> result of remote method
