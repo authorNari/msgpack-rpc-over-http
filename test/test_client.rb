@@ -43,6 +43,11 @@ module MessagePack::RPCOverHTTP
         future = @client.call(:error)
         future.value
       end
+
+      # multi-call
+      (1..20).map{|i| [@client.call_async(:test, i), i] }.each do |f, i|
+        assert_equal [i], f.value
+      end
     end
 
     def test_callback
