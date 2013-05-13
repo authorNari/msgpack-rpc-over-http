@@ -1,4 +1,4 @@
-require 'celluloid'
+# require 'celluloid'
 require 'httpclient'
 require 'forwardable'
 
@@ -36,6 +36,7 @@ module MessagePack
       # Calls remote method asynchronously.
       # This method is non-blocking and returns Future.
       def call_async(method, *args)
+        require 'celluloid'
         return Celluloid::Future.new{ send_request(method, args) }
       end
 
@@ -46,6 +47,7 @@ module MessagePack
       # The callback method is called with Future when the result is reached.
       # `err' is assigned a instance of RemoteError or child if res is nil.
       def callback(method, *args, &block)
+        require 'celluloid'
         return Celluloid::Future.new do
           begin
             block.call(send_request(method, args))
@@ -76,6 +78,7 @@ module MessagePack
       #
       # Calls remote method asynchronously with streaming.
       def stream_async(method, *args, &block)
+        require 'celluloid'
         return Celluloid::Future.new do
           stream(method, *args, &block)
         end
