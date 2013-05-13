@@ -16,7 +16,7 @@ module MessagePack
             raise NoMethodError, "method `#{method}' is not accepted"
           end
 
-          return @handler.send(method, *params)
+          return @handler.__send__(method, *params)
         end
       end
     end
