@@ -19,7 +19,9 @@ module MessagePack
       end
 
       def_delegators(:@client,
-        :connect_timeout, :send_timeout, :receive_timeout, :debug_dev=)
+        :connect_timeout, :send_timeout, :receive_timeout,
+        :connect_timeout=, :send_timeout=, :receive_timeout=,
+        :debug_dev=)
 
       # call-seq:
       #   call(symbol, *args) -> result of remote method
