@@ -31,6 +31,13 @@ class MockHandler
   end
 end
 
+def jruby?
+  if /java/ =~ RUBY_PLATFORM
+    return true
+  end
+  false
+end
+
 def sleep_until_http_server_is_started(host, port)
   timeout(30) do 
     while stopped_test_app_server?(host, port)
