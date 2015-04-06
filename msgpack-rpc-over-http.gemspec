@@ -20,5 +20,6 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency "celluloid", "~> 0.12.3"
   gem.add_runtime_dependency "httpclient"
 
-  gem.add_development_dependency "thin"
+  gem.add_development_dependency "rake"
+  gem.add_development_dependency "test-unit"
 end
