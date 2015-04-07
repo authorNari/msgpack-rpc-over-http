@@ -16,9 +16,10 @@ Gem::Specification.new do |gem|
   gem.version       = MessagePack::RPCOverHTTP::VERSION
 
   gem.add_runtime_dependency "rack"
-  gem.add_runtime_dependency "msgpack", "~> 0.5.5"
-  gem.add_runtime_dependency "celluloid", "~> 0.12.3"
+  gem.add_runtime_dependency "msgpack", "~> 0.5.11"
+  gem.add_runtime_dependency "celluloid", "~> 0.16.0"
   gem.add_runtime_dependency "httpclient"
 
-  gem.add_development_dependency "thin"
+  gem.add_development_dependency "rake"
+  gem.add_development_dependency "test-unit", "~> 3.0"
 end

@@ -1,3 +1,5 @@
+require 'rack'
+
 module MessagePack::RPCOverHTTP
   class TestClient < Test::Unit::TestCase
     def self.unused_port
@@ -13,13 +15,32 @@ module MessagePack::RPCOverHTTP
     def setup
       @client = Client.new("http://0.0.0.0:#{@@server_port}/")
       if @@is_stopped_test_app_server
-        pid = fork {
-          Rack::Server.start(config: "test/mock_server.ru", Port: @@server_port)
-          exit 0
-        }
-        at_exit do
-          Process.kill(:INT, pid)
-          Process.waitpid(pid)
+        if /java/ =~ RUBY_PLATFORM
+          mizuno = nil
+          thread = Thread.new do
+            Thread.current.abort_on_exception = true
+            require 'mizuno/server'
+            app = Rack::Builder.new {
+              # MockHandler is in helper.rb
+              run MessagePack::RPCOverHTTP::Server.app(MockHandler.new)
+            }
+            mizuno = Mizuno::Server.new
+            mizuno.run(app, embedded: true, threads: 1, port: @@server_port, host: '0.0.0.0')
+          end
+          at_exit do
+            mizuno.stop
+            thread.kill
+            thread.join
+          end
+        else
+          pid = fork {
+            Rack::Server.start(config: "test/mock_server.ru", Port: @@server_port)
+            exit 0
+          }
+          at_exit do
+            Process.kill(:INT, pid)
+            Process.waitpid(pid)
+          end
         end
         sleep_until_http_server_is_started("0.0.0.0", @@server_port)
         @@is_stopped_test_app_server = false
@@ -37,6 +58,8 @@ module MessagePack::RPCOverHTTP
     end
 
     def test_call_async
+      pend "msgpack-rpc-over-http does not support Client#async for jruby" if jruby?
+
       future = @client.call_async(:test, "a", "b")
       assert_equal ["a", "b"], future.value
       assert_raise(MessagePack::RPCOverHTTP::RuntimeError) do
@@ -62,6 +85,7 @@ module MessagePack::RPCOverHTTP
     end
 
     def test_stream
+      pend "msgpack-rpc-over-http does not support Client#stream for jruby" if jruby?
       expect = ["a", "b"]
       @client.stream(:stream_normal, "a", "b") do |res|
         assert_equal expect.shift, res
@@ -78,6 +102,7 @@ module MessagePack::RPCOverHTTP
     end
 
     def test_stream_async
+      pend "msgpack-rpc-over-http does not support Client#stream_async for jruby" if jruby?
       expect = ["a", "b"]
       future = @client.stream_async(:stream_normal, "a", "b") do |res|
         assert_equal expect.shift, res
