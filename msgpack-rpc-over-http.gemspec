@@ -15,6 +15,10 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = MessagePack::RPCOverHTTP::VERSION
 
+  if /java/ =~ RUBY_PLATFORM
+    gem.platform = "java"
+  end
+
   gem.add_runtime_dependency "rack"
   gem.add_runtime_dependency "msgpack", "~> 0.5.11"
   gem.add_runtime_dependency "celluloid", "~> 0.16.0"
