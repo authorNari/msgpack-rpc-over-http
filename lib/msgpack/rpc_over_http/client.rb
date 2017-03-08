@@ -11,11 +11,12 @@ module MessagePack
 
       HEADER = {"Content-Type" => 'application/x-msgpack'}
 
-      def initialize(url, options={})
+      def initialize(url, factory: nil)
         @url = url
         @client = HTTPClient.new
         @reqtable = {}
         @seqid = 0
+        @factory = factory || MessagePack::Factory.new
       end
 
       def_delegators(:@client,
@@ -98,11 +99,13 @@ module MessagePack
         msgid = @seqid
         @seqid += 1
         @seqid = 0 if @seqid >= (1 << 31)
-        data = [REQUEST, msgid, method, param].to_msgpack
+        packer = @factory.packer
+        data = packer.write([REQUEST, msgid, method, param]).to_s
       end
 
       def get_result(body)
-        type, msgid, err, res = MessagePack.unpack(body)
+        unpacker = @factory.unpacker
+        type, msgid, err, res = unpacker.feed(body).read
         raise "Unknown message type #{type}" if type != RESPONSE
 
         if err.nil?

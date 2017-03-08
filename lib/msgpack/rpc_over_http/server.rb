@@ -11,11 +11,11 @@ module MessagePack
 
       # Retruns the application for MessagePack-RPC.
       # It's create with Rack::Builder
-      def self.app(handler)
+      def self.app(handler, factory = nil)
         return Rack::Builder.app do
           use Rack::Chunked
-          use RequestUnpacker
-          use ResponsePacker
+          use RequestUnpacker, factory
+          use ResponsePacker, factory
           use Dispatcher
           run handler
         end

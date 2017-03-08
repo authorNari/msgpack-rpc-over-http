@@ -5,8 +5,9 @@ module MessagePack
       # Rack Middleware that unpacks a serialized string in a HTTP
       # request.
       class RequestUnpacker
-        def initialize(app)
+        def initialize(app, factory = nil)
           @app = app
+          @factory = factory || MessagePack::Factory.new
         end
 
         def call(env)
@@ -49,7 +50,8 @@ module MessagePack
         end
 
         def unpack(env, body)
-          msg = MessagePack.unpack(body)
+          unpacker = @factory.unpacker
+          msg = unpacker.feed(body).read
           env['msgpack-rpc.type'] = msg[0]
           case msg[0]
           when REQUEST
