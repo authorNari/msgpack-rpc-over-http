@@ -1,5 +1,15 @@
 require 'rack'
 
+class Time
+  def self.from_msgpack_ext(data)
+    sec, usec = MessagePack.unpack(data)
+    Time.at(sec, usec)
+  end
+  def to_msgpack_ext
+    [to_i, usec].to_msgpack
+  end
+end
+
 module MessagePack::RPCOverHTTP
   class TestClient < Test::Unit::TestCase
     def self.unused_port
@@ -13,7 +23,9 @@ module MessagePack::RPCOverHTTP
     @@is_stopped_test_app_server = true
 
     def setup
-      @client = Client.new("http://0.0.0.0:#{@@server_port}/")
+      msgpack_factory = MessagePack::Factory.new
+      msgpack_factory.register_type(0x01, Time)
+      @client = Client.new("http://0.0.0.0:#{@@server_port}/", factory: msgpack_factory)
       if @@is_stopped_test_app_server
         if /java/ =~ RUBY_PLATFORM
           mizuno = nil
@@ -22,7 +34,7 @@ module MessagePack::RPCOverHTTP
             require 'mizuno/server'
             app = Rack::Builder.new {
               # MockHandler is in helper.rb
-              run MessagePack::RPCOverHTTP::Server.app(MockHandler.new)
+              run MessagePack::RPCOverHTTP::Server.app(MockHandler.new, msgpack_factory)
             }
             mizuno = Mizuno::Server.new
             mizuno.run(app, embedded: true, threads: 1, port: @@server_port, host: '0.0.0.0')
@@ -34,7 +46,7 @@ module MessagePack::RPCOverHTTP
           end
         else
           pid = fork {
-            Rack::Server.start(config: "test/mock_server.ru", Port: @@server_port)
+            Rack::Server.start(config: "test/mock_server.ru", Port: @@server_port, Host: '0.0.0.0')
             exit 0
           }
           at_exit do
@@ -42,7 +54,7 @@ module MessagePack::RPCOverHTTP
             Process.waitpid(pid)
           end
         end
-        sleep_until_http_server_is_started("0.0.0.0", @@server_port)
+        sleep_until_http_server_is_started("127.0.0.1", @@server_port)
         @@is_stopped_test_app_server = false
       end
     end
@@ -55,6 +67,13 @@ module MessagePack::RPCOverHTTP
       assert_raise(MockHandler::Error) do
         @client.call(:user_defined_error)
       end
+    end
+
+    def test_call_with_ext_type
+      require 'time'
+      t1 = Time.parse('2017-03-08 13:59:00')
+      t2 = Time.now
+      assert_equal [t1, t2], @client.call(:test, t1, t2)
     end
 
     def test_call_async
