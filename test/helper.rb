@@ -39,7 +39,7 @@ def jruby?
 end
 
 def sleep_until_http_server_is_started(host, port)
-  timeout(30) do 
+  timeout(30) do
     while stopped_test_app_server?(host, port)
       sleep 1
     end
