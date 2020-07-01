@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
 
   gem.add_runtime_dependency "rack"
   gem.add_runtime_dependency "msgpack", "~> 1.0"
-  gem.add_runtime_dependency "celluloid", "~> 0.16.0"
+  gem.add_runtime_dependency "celluloid", "~> 0.17"
   gem.add_runtime_dependency "httpclient"
 
   gem.add_development_dependency "rake"
